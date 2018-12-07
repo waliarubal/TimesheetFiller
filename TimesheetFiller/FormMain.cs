@@ -11,7 +11,7 @@ namespace TimesheetFiller
         RestClient _client;
 
         const string
-            BASE_URL = "http://ems.projectstatus.in",
+            BASE_URL = "http://ems.dotsquares.com",
             TIMESHEET_URL = "timesheet/index",
             TIMESHEET_GET_DATA_URL = "timesheet/GetData",
             TIMESHEET_ADD_DATA_URL = "timesheet/AddTimesheetData";
@@ -166,7 +166,7 @@ namespace TimesheetFiller
             request.AddParameter("pageNumber", 1);
             request.AddParameter("pageSize", 25);
             IRestResponse<Data> data = Client.Execute<Data>(request);
-            if (data.StatusCode != HttpStatusCode.OK)
+            if (!(data.StatusCode == HttpStatusCode.OK || data.StatusCode == HttpStatusCode.Found))
             {
                 MessageBox.Show("Failed to get data from EMS.");
                 txtUserName.Focus();

@@ -1,7 +1,10 @@
 ﻿using RestSharp;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TimesheetFiller
@@ -11,7 +14,7 @@ namespace TimesheetFiller
         RestClient _client;
 
         const string
-            BASE_URL = "http://ems.dotsquares.com",
+            BASE_URL = "https://ems.dotsquares.com",
             TIMESHEET_URL = "timesheet/index",
             TIMESHEET_GET_DATA_URL = "timesheet/GetData",
             TIMESHEET_ADD_DATA_URL = "timesheet/AddTimesheetData";
@@ -84,7 +87,7 @@ namespace TimesheetFiller
 
         #endregion
 
-        private void btnAdd_Click(object sender, EventArgs e)
+        private async void btnAdd_Click(object sender, EventArgs e)
         {
             if (Project == null)
             {
@@ -111,28 +114,12 @@ namespace TimesheetFiller
                 return;
             }
 
-            var startDateMinusOne = StartDate.Subtract(new TimeSpan(1, 0, 0, 0));
-            var endDate = EndDate;
-            while (startDateMinusOne.Date <= endDate.Date)
-            {
-                startDateMinusOne = startDateMinusOne.AddDays(1);
-                if (startDateMinusOne.DayOfWeek == DayOfWeek.Saturday || startDateMinusOne.DayOfWeek == DayOfWeek.Sunday)
-                    continue;
-
-                var request = new RestRequest(TIMESHEET_ADD_DATA_URL, Method.POST, DataFormat.Json);
-                request.AddParameter("AddedDate", string.Format("{0}/{1}/{2}", startDateMinusOne.Day, startDateMinusOne.Month, startDateMinusOne.Year));
-                request.AddParameter("Description", Description);
-                request.AddParameter("DeveloperId", Developer.Id);
-                request.AddParameter("Id", 0);
-                request.AddParameter("ProjectId", Project.Id);
-                request.AddParameter("WorkHours", "08:00");
-                var response = Client.Execute(request);
-                if (response.StatusCode != HttpStatusCode.OK)
-                    continue;
-            }
+            var missedRecordDates = await AddTimesheetData(Client, Project, Developer, StartDate, EndDate, Description);
+            if (missedRecordDates.Count > 0)
+                MessageBox.Show("Failed to add timesheet records.");
         }
 
-        private void btnLogin_Click(object sender, EventArgs e)
+        private async void btnLogin_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(UserName))
             {
@@ -147,43 +134,84 @@ namespace TimesheetFiller
                 return;
             }
 
-            var request = new RestRequest("/", Method.POST, DataFormat.Json);
-            request.AddParameter("Email", UserName);
-            request.AddParameter("Password", Password);
-            request.AddParameter("ReturnUrl", string.Empty);
-
-            var response = Client.Execute(request);
-            if (response.StatusCode != HttpStatusCode.Found && response.StatusCode != HttpStatusCode.OK)
+            var data = await Authenticate(Client, UserName, Password);
+            if (data.Key != null)
             {
-                MessageBox.Show("Invalid user name or password.");
-                txtUserName.Focus();
-                return;
-            }
-
-            request = new RestRequest(TIMESHEET_GET_DATA_URL, Method.POST, DataFormat.Json);
-            request.AddParameter("DateFrom", string.Empty);
-            request.AddParameter("DateTo", string.Empty);
-            request.AddParameter("pageNumber", 1);
-            request.AddParameter("pageSize", 25);
-            IRestResponse<Data> data = Client.Execute<Data>(request);
-            if (!(data.StatusCode == HttpStatusCode.OK || data.StatusCode == HttpStatusCode.Found))
-            {
-                MessageBox.Show("Failed to get data from EMS.");
+                MessageBox.Show(data.Key);
                 txtUserName.Focus();
                 return;
             }
 
             cboProject.BeginUpdate();
             cboProject.Items.Clear();
-            foreach (var project in data.Data.Projects)
+            foreach (var project in data.Value.Projects)
                 cboProject.Items.Add(project);
             cboProject.EndUpdate();
 
             cboDeveloper.BeginUpdate();
             cboDeveloper.Items.Clear();
-            foreach (var developer in data.Data.Developer)
+            foreach (var developer in data.Value.Developer)
                 cboDeveloper.Items.Add(developer);
             cboDeveloper.EndUpdate();
         }
+
+        #region private methods
+
+        async Task<IList<DateTime>> AddTimesheetData(RestClient client, Record project, Record developer, DateTime startDate, DateTime endDate, string description)
+        {
+            var tokenSource = new CancellationTokenSource();
+
+            var missedRecordDates = new List<DateTime>();
+            var startDateMinusOne = startDate.Subtract(new TimeSpan(1, 0, 0, 0));
+            while (startDateMinusOne.Date <= endDate.Date)
+            {
+                startDateMinusOne = startDateMinusOne.AddDays(1);
+                if (startDateMinusOne.DayOfWeek == DayOfWeek.Saturday || startDateMinusOne.DayOfWeek == DayOfWeek.Sunday)
+                    continue;
+
+                var request = new RestRequest(TIMESHEET_ADD_DATA_URL, Method.POST, DataFormat.Json);
+                request.AddParameter("AddedDate", string.Format("{0}/{1}/{2}", startDateMinusOne.Day, startDateMinusOne.Month, startDateMinusOne.Year));
+                request.AddParameter("Description", description);
+                request.AddParameter("DeveloperId", developer.Id);
+                request.AddParameter("Id", 0);
+                request.AddParameter("ProjectId", project.Id);
+                request.AddParameter("WorkHours", "08:00");
+                var response = await client.ExecuteTaskAsync(request, tokenSource.Token);
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    missedRecordDates.Add(startDateMinusOne);
+                    continue;
+                }
+            }
+
+            return missedRecordDates;
+        }
+
+        async Task<KeyValuePair<string, Data>> Authenticate(RestClient client, string userName, string password)
+        {
+            var tokenSource = new CancellationTokenSource();
+
+            var request = new RestRequest("/", Method.POST, DataFormat.Json);
+            request.AddParameter("Email", UserName);
+            request.AddParameter("Password", Password);
+            request.AddParameter("ReturnUrl", string.Empty);
+
+            var response = await client.ExecuteTaskAsync(request, tokenSource.Token);
+            if (response.StatusCode != HttpStatusCode.Found && response.StatusCode != HttpStatusCode.OK)
+                return new KeyValuePair<string, Data>("Invalid user name or password.", null);
+
+            request = new RestRequest(TIMESHEET_GET_DATA_URL, Method.POST, DataFormat.Json);
+            request.AddParameter("DateFrom", string.Empty);
+            request.AddParameter("DateTo", string.Empty);
+            request.AddParameter("pageNumber", 1);
+            request.AddParameter("pageSize", 25);
+            IRestResponse<Data> data = await client.ExecuteTaskAsync<Data>(request, tokenSource.Token);
+            if (!(data.StatusCode == HttpStatusCode.OK || data.StatusCode == HttpStatusCode.Found))
+                return new KeyValuePair<string, Data>("Failed to get data from EMS.", null);
+
+            return new KeyValuePair<string, Data>(null, data.Data);
+        }
+
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
 ﻿using RestSharp.Deserializers;
+using System;
 using System.Collections.Generic;
 
 namespace TimesheetFiller
@@ -31,6 +32,15 @@ namespace TimesheetFiller
         }
     }
 
+    class TimesheetRecord: Record
+    {
+        [DeserializeAs(Name = "AddedDateEdit")]
+        public DateTime Date { get; set; }
+
+        [DeserializeAs(Name = "WorkHoursEdit")]
+        public TimeSpan Time { get; set; }
+    }
+
     class Data
     {
         [DeserializeAs(Name = "ProjectList")]
@@ -38,6 +48,9 @@ namespace TimesheetFiller
 
 
         [DeserializeAs(Name = "DeveloperList")]
-        public List<Record> Developer { get; set; }
+        public List<Record> Developers { get; set; }
+
+        [DeserializeAs(Name = "TimeSheetList")]
+        public List<TimesheetRecord> TimeEntries { get; set; }
     }
 }

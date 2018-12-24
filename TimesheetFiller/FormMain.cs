@@ -150,9 +150,11 @@ namespace TimesheetFiller
 
             cboDeveloper.BeginUpdate();
             cboDeveloper.Items.Clear();
-            foreach (var developer in data.Value.Developer)
+            foreach (var developer in data.Value.Developers)
                 cboDeveloper.Items.Add(developer);
             cboDeveloper.EndUpdate();
+
+            dtpStartDate.Value = data.Value.TimeEntries[0].Date.AddDays(1);
         }
 
         #region private methods
@@ -163,7 +165,7 @@ namespace TimesheetFiller
 
             var missedRecordDates = new List<DateTime>();
             var startDateMinusOne = startDate.Subtract(new TimeSpan(1, 0, 0, 0));
-            while (startDateMinusOne.Date <= endDate.Date)
+            while (startDateMinusOne.Date < endDate.Date)
             {
                 startDateMinusOne = startDateMinusOne.AddDays(1);
                 if (startDateMinusOne.DayOfWeek == DayOfWeek.Saturday || startDateMinusOne.DayOfWeek == DayOfWeek.Sunday)
@@ -201,6 +203,7 @@ namespace TimesheetFiller
                 return new KeyValuePair<string, Data>("Invalid user name or password.", null);
 
             request = new RestRequest(TIMESHEET_GET_DATA_URL, Method.POST, DataFormat.Json);
+            request.DateFormat = "dd/MM/yyyy";
             request.AddParameter("DateFrom", string.Empty);
             request.AddParameter("DateTo", string.Empty);
             request.AddParameter("pageNumber", 1);

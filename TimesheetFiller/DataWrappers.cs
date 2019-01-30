@@ -4,6 +4,30 @@ using System.Collections.Generic;
 
 namespace TimesheetFiller
 {
+    class AttendanceRecord
+    {
+        [DeserializeAs(Name = "date")]
+        public DateTime Date { get; set; }
+
+        [DeserializeAs(Name = "intime")]
+        public DateTime? InTime { get; set; }
+
+        [DeserializeAs(Name = "outtime")]
+        public DateTime? OutTime { get; set; }
+
+        [DeserializeAs(Name = "totalWorkingHours")]
+        public TimeSpan? WorkingHours { get; set; }
+
+        [DeserializeAs(Name = "status")]
+        public string Status { get; set; }
+    }
+
+    class AttendanceData
+    {
+        [DeserializeAs(Name = "data")]
+        public List<AttendanceRecord> AtendanceEntries { get; set; }
+    }
+
     class Record
     {
         [DeserializeAs(Name = "Id")]

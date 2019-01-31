@@ -103,6 +103,7 @@
             // 
             // cboMonth
             // 
+            this.cboMonth.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboMonth.FormattingEnabled = true;
             this.cboMonth.Location = new System.Drawing.Point(49, 4);
             this.cboMonth.Name = "cboMonth";

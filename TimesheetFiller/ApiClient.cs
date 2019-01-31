@@ -1,4 +1,5 @@
-﻿using RestSharp;
+﻿using Newtonsoft.Json;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -31,6 +32,7 @@ namespace TimesheetFiller
                 CookieContainer = _cookieContainer
 
             };
+
             TokenSource = new CancellationTokenSource();
         }
 
@@ -63,6 +65,12 @@ namespace TimesheetFiller
             return null;
         }
 
+        T Deserialize<T>(string json)
+        {
+            var settings = new JsonSerializerSettings { DateFormatString = "dd/MM/yyyy" };
+            return JsonConvert.DeserializeObject<T>(json, settings);
+        }
+
         public async Task<KeyValuePair<string, bool>> Authenticate(string userName, string password)
         {
             var request = new RestRequest("/", Method.POST, DataFormat.Json);
@@ -80,16 +88,16 @@ namespace TimesheetFiller
         public async Task<KeyValuePair<string, Data>> GetTimesheetData()
         {
             var request = new RestRequest(TIMESHEET_GET_DATA_URL, Method.POST, DataFormat.Json);
-            request.DateFormat = "dd/MM/yyyy";
             request.AddParameter("DateFrom", string.Empty);
             request.AddParameter("DateTo", string.Empty);
             request.AddParameter("pageNumber", 1);
             request.AddParameter("pageSize", 25);
-            IRestResponse<Data> data = await Client.ExecuteTaskAsync<Data>(request, TokenSource.Token);
-            if (!(data.StatusCode == HttpStatusCode.OK || data.StatusCode == HttpStatusCode.Found))
+            IRestResponse response = await Client.ExecuteTaskAsync(request, TokenSource.Token);
+            if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.Found)
                 return new KeyValuePair<string, Data>("Failed to get data from EMS.", null);
 
-            return new KeyValuePair<string, Data>(null, data.Data);
+            var data = Deserialize<Data>(response.Content); 
+            return new KeyValuePair<string, Data>(null, data);
         }
 
         public async Task<IList<DateTime>> AddTimesheetData(Record project, Record developer, DateTime startDate, DateTime endDate, string description)
@@ -119,7 +127,7 @@ namespace TimesheetFiller
 
             return missedRecordDates;
         }
-   
+
         public async Task<AttendanceData> GetAttendanceData(int month, int year)
         {
             var userId = long.Parse(GetCookie("UserSessionCookies").Replace("{\"Uid\":", string.Empty).Replace("}", string.Empty));
@@ -129,12 +137,13 @@ namespace TimesheetFiller
             request.AddParameter("userid", userId);
             request.AddParameter("draw", 1);
             request.AddParameter("start", 0);
-            
-            var response = await Client.ExecuteTaskAsync<AttendanceData>(request, TokenSource.Token);
+
+            var response = await Client.ExecuteTaskAsync(request, TokenSource.Token);
             if (response.StatusCode != HttpStatusCode.OK)
                 return null;
 
-            return response.Data;
+            var data = Deserialize<AttendanceData>(response.Content);
+            return data;
         }
 
     }

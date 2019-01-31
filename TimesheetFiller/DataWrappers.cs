@@ -1,4 +1,4 @@
-﻿using RestSharp.Deserializers;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
@@ -31,34 +31,34 @@ namespace TimesheetFiller
 
     class AttendanceRecord
     {
-        [DeserializeAs(Name = "date")]
+        [JsonProperty(PropertyName = "date")]
         public DateTime Date { get; set; }
 
-        [DeserializeAs(Name = "intime")]
+        [JsonProperty(PropertyName = "intime")]
         public DateTime? InTime { get; set; }
 
-        [DeserializeAs(Name = "outtime")]
+        [JsonProperty(PropertyName = "outtime")]
         public DateTime? OutTime { get; set; }
 
-        [DeserializeAs(Name = "totalWorkingHours")]
+        [JsonProperty(PropertyName = "totalWorkingHours")]
         public TimeSpan? WorkingHours { get; set; }
 
-        [DeserializeAs(Name = "status")]
+        [JsonProperty(PropertyName = "status")]
         public string Status { get; set; }
     }
 
     class AttendanceData
     {
-        [DeserializeAs(Name = "data")]
+        [JsonProperty(PropertyName = "data")]
         public List<AttendanceRecord> AtendanceEntries { get; set; }
     }
 
     class Record
     {
-        [DeserializeAs(Name = "Id")]
+        [JsonProperty(PropertyName = "Id")]
         public int Id { get; set; }
 
-        [DeserializeAs(Name = "Name")]
+        [JsonProperty(PropertyName = "Name")]
         public string Name { get; set; }
 
         public override string ToString()
@@ -83,23 +83,22 @@ namespace TimesheetFiller
 
     class TimesheetRecord : Record
     {
-        [DeserializeAs(Name = "AddedDateEdit")]
+        [JsonProperty(PropertyName = "AddedDateEdit")]
         public DateTime Date { get; set; }
 
-        [DeserializeAs(Name = "WorkHoursEdit")]
+        [JsonProperty(PropertyName = "WorkHoursEdit")]
         public TimeSpan Time { get; set; }
     }
 
     class Data
     {
-        [DeserializeAs(Name = "ProjectList")]
+        [JsonProperty(PropertyName = "ProjectList")]
         public List<Record> Projects { get; set; }
 
-
-        [DeserializeAs(Name = "DeveloperList")]
+        [JsonProperty(PropertyName = "DeveloperList")]
         public List<Record> Developers { get; set; }
 
-        [DeserializeAs(Name = "TimeSheetList")]
+        [JsonProperty(PropertyName = "TimeSheetList")]
         public List<TimesheetRecord> TimeEntries { get; set; }
     }
 }

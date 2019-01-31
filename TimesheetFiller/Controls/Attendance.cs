@@ -10,11 +10,26 @@ namespace TimesheetFiller.Controls
         public Attendance()
         {
             InitializeComponent();
+
+            var now = DateTime.Now;
+            var thisMonth = new DateTime(now.Year, now.Month, 1);
+            var lastMonth = thisMonth.AddMonths(-1);
+            var lastToLastMonth = lastMonth.AddMonths(-1);
+
+            cboMonth.Items.Add(new DateWrapper(thisMonth));
+            cboMonth.Items.Add(new DateWrapper(lastMonth));
+            cboMonth.Items.Add(new DateWrapper(lastToLastMonth));
+            cboMonth.SelectedIndex = 0;
+        }
+
+        public DateWrapper SelectedMonth
+        {
+            get => cboMonth.SelectedItem as DateWrapper;
         }
 
         public async Task Populate()
         {
-            var data = await ApiClient.Instance.GetAttendanceData(12, 2018);
+            var data = await ApiClient.Instance.GetAttendanceData(SelectedMonth.Month, SelectedMonth.Year);
 
             dgvAttendance.SuspendLayout();
 
@@ -54,6 +69,11 @@ namespace TimesheetFiller.Controls
             }
 
             dgvAttendance.ResumeLayout();
+        }
+
+        private async void btnRefresh_Click(object sender, EventArgs e)
+        {
+            await Populate();
         }
     }
 }

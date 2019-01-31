@@ -4,6 +4,31 @@ using System.Collections.Generic;
 
 namespace TimesheetFiller
 {
+    class DateWrapper
+    {
+        readonly DateTime _date;
+
+        public DateWrapper(DateTime date)
+        {
+            _date = date;
+        }
+
+        public int Year
+        {
+            get => _date.Year;
+        }
+
+        public int Month
+        {
+            get => _date.Month;
+        }
+
+        public override string ToString()
+        {
+            return _date.ToString("MMMMM yyyy");
+        }
+    }
+
     class AttendanceRecord
     {
         [DeserializeAs(Name = "date")]
@@ -56,7 +81,7 @@ namespace TimesheetFiller
         }
     }
 
-    class TimesheetRecord: Record
+    class TimesheetRecord : Record
     {
         [DeserializeAs(Name = "AddedDateEdit")]
         public DateTime Date { get; set; }

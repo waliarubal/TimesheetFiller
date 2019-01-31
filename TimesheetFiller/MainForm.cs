@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Windows.Forms;
 
-namespace TimesheetFiller
+namespace EmsTool
 {
     partial class MainForm : Form
     {
@@ -13,7 +13,7 @@ namespace TimesheetFiller
 
             if (Debugger.IsAttached)
             {
-                txtUserName.Text = "rubal.walia@dotsquares.com";
+                txtUserName.Text = "rubal.walia";
                 txtPassword.Text = "dots@123";
             }
         }
@@ -52,7 +52,10 @@ namespace TimesheetFiller
                 return;
             }
 
-            var data = await ApiClient.Instance.Authenticate(UserName, Password);
+            btnLogin.Enabled = false;
+
+            var userName = UserName.EndsWith("@dotsquares.com") ? UserName : string.Format("{0}@dotsquares.com", UserName);
+            var data = await ApiClient.Instance.Authenticate(userName, Password);
             if (data.Key != null)
             {
                 MessageBox.Show(data.Key);
@@ -65,6 +68,8 @@ namespace TimesheetFiller
             await timesheetFiller.Populate();
             await attendance.Populate();
             tabContainer.Enabled = IsAuthenticated;
+
+            btnLogin.Enabled = true;
         }
     }
 }

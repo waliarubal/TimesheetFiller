@@ -1,4 +1,4 @@
-﻿namespace TimesheetFiller
+﻿namespace EmsTool
 {
     partial class MainForm
     {
@@ -29,18 +29,19 @@
         private void InitializeComponent()
         {
             this.tabContainer = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.timesheetFiller = new TimesheetFiller.Controls.Timesheet();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.attendance = new TimesheetFiller.Controls.Attendance();
+            this.attendance = new EmsTool.Controls.Attendance();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.timesheetFiller = new EmsTool.Controls.Timesheet();
             this.btnLogin = new System.Windows.Forms.Button();
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.txtUserName = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.tabContainer.SuspendLayout();
-            this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabContainer
@@ -54,29 +55,8 @@
             this.tabContainer.Location = new System.Drawing.Point(13, 93);
             this.tabContainer.Name = "tabContainer";
             this.tabContainer.SelectedIndex = 0;
-            this.tabContainer.Size = new System.Drawing.Size(775, 345);
+            this.tabContainer.Size = new System.Drawing.Size(599, 336);
             this.tabContainer.TabIndex = 0;
-            // 
-            // tabPage1
-            // 
-            this.tabPage1.Controls.Add(this.timesheetFiller);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(767, 319);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Timesheet";
-            this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // timesheetFiller
-            // 
-            this.timesheetFiller.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.timesheetFiller.Location = new System.Drawing.Point(6, 6);
-            this.timesheetFiller.Name = "timesheetFiller";
-            this.timesheetFiller.Size = new System.Drawing.Size(755, 307);
-            this.timesheetFiller.TabIndex = 0;
             // 
             // tabPage2
             // 
@@ -84,7 +64,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(767, 319);
+            this.tabPage2.Size = new System.Drawing.Size(591, 310);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Attendance";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -99,10 +79,33 @@
             this.attendance.Size = new System.Drawing.Size(755, 307);
             this.attendance.TabIndex = 0;
             // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.timesheetFiller);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(591, 310);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Timesheet";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // timesheetFiller
+            // 
+            this.timesheetFiller.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.timesheetFiller.BackColor = System.Drawing.Color.Transparent;
+            this.timesheetFiller.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.timesheetFiller.Location = new System.Drawing.Point(6, 6);
+            this.timesheetFiller.Name = "timesheetFiller";
+            this.timesheetFiller.Size = new System.Drawing.Size(579, 298);
+            this.timesheetFiller.TabIndex = 0;
+            // 
             // btnLogin
             // 
             this.btnLogin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLogin.Location = new System.Drawing.Point(713, 64);
+            this.btnLogin.Location = new System.Drawing.Point(537, 64);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(75, 23);
             this.btnLogin.TabIndex = 13;
@@ -116,7 +119,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtPassword.Location = new System.Drawing.Point(81, 38);
             this.txtPassword.Name = "txtPassword";
-            this.txtPassword.Size = new System.Drawing.Size(707, 20);
+            this.txtPassword.Size = new System.Drawing.Size(531, 20);
             this.txtPassword.TabIndex = 12;
             this.txtPassword.UseSystemPasswordChar = true;
             // 
@@ -126,7 +129,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtUserName.Location = new System.Drawing.Point(81, 12);
             this.txtUserName.Name = "txtUserName";
-            this.txtUserName.Size = new System.Drawing.Size(707, 20);
+            this.txtUserName.Size = new System.Drawing.Size(438, 20);
             this.txtUserName.TabIndex = 11;
             // 
             // label2
@@ -147,11 +150,21 @@
             this.label1.TabIndex = 9;
             this.label1.Text = "User Name:";
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(519, 15);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(93, 13);
+            this.label3.TabIndex = 14;
+            this.label3.Text = "@dotsquares.com";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(624, 441);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.txtPassword);
             this.Controls.Add(this.txtUserName);
@@ -162,8 +175,8 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "EMS Tool";
             this.tabContainer.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -181,5 +194,6 @@
         private System.Windows.Forms.Label label1;
         private Controls.Timesheet timesheetFiller;
         private Controls.Attendance attendance;
+        private System.Windows.Forms.Label label3;
     }
 }

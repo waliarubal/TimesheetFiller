@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TimesheetFiller.Controls
+namespace EmsTool.Controls
 {
     partial class Attendance : UserControl
     {
@@ -65,6 +65,11 @@ namespace TimesheetFiller.Controls
                     case "Absent":
                         cells[4].Style.ForeColor = Color.Red;
                         break;
+
+                    default:
+                        if (entry.Status.StartsWith("Holiday"))
+                            cells[4].Style.ForeColor = Color.Orange;
+                        break;
                 }
             }
 
@@ -73,7 +78,9 @@ namespace TimesheetFiller.Controls
 
         private async void btnRefresh_Click(object sender, EventArgs e)
         {
+            btnRefresh.Enabled = false;
             await Populate();
+            btnRefresh.Enabled = true;
         }
     }
 }

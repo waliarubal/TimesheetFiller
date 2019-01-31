@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace TimesheetFiller.Controls
+namespace EmsTool.Controls
 {
     partial class Timesheet : UserControl
     {
@@ -67,9 +67,15 @@ namespace TimesheetFiller.Controls
                 return;
             }
 
+            btnAdd.Enabled = false;
+
             var missedRecordDates = await ApiClient.Instance.AddTimesheetData(Project, Developer, StartDate, EndDate, Description);
             if (missedRecordDates.Count > 0)
                 MessageBox.Show("Failed to add timesheet records.");
+            else
+                MessageBox.Show("Timesheet records added successfully.");
+
+            btnAdd.Enabled = true;
         }
 
         public async Task Populate()
